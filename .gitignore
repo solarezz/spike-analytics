@@ -1,0 +1,46 @@
+# Ваши кастомные файлы для исключения
+.env
+README_LLM.md
+test.py
+
+# Файлы окружения и зависимостей
+venv/
+.env/
+.env.local
+.env.development
+.env.test
+.env.production
+pip-selfcheck.json
+PyPI.json
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+
+# Логи и дампы
+*.log
+*.pot
+*.sqlite3
+*.dump
+
+# Директории сборки и дистрибуции
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Файлы IDE и редакторов
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+
+# Тестовые покрытия и проверки
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
