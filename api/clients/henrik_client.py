@@ -1,5 +1,6 @@
 import requests
 from typing import Optional, Dict, Any
+from api.models.player import Player, RankInfo
 
 
 class HenrikAPIClient:
@@ -19,9 +20,12 @@ class HenrikAPIClient:
             print(f"Error making request: {e}")
             return None
         
-    def get_player_stats(self, name: str, tag: str) -> Optional[Dict[str, Any]]:
+    def get_player_stats(self, name: str, tag: str) -> Optional[Player]:
         endpoint = f"v1/account/{name}/{tag}"
-        return self._make_requests(endpoint)
+        response = self._make_requests(endpoint)
+        if response and response.get('status') == 200:
+            return Player(**response['data'])
+        return None
     
     def get_matchlist(self, name: str, tag: str, region: str) -> Optional[Dict[str, Any]]:
         endpoint = f"v3/matches/{region}/{name}/{tag}"
@@ -38,3 +42,22 @@ class HenrikAPIClient:
     def get_mmr(self, region: str, puuid: str) -> Optional[Dict[str, Any]]:
         endpoint = f"v2/by-puuid/mmr/{region}/{puuid}"
         return self._make_requests(endpoint)
+    
+    def get_full_player_info(self, name: str, tag: str) -> Optional[Player]:
+        player = self.get_player_stats(name, tag)
+        if not player:
+            return None
+        
+        mmr_response = self._make_requests(f"v2/by-puuid/mmr/{player.region}/{player.puuid}")
+        
+        if mmr_response and mmr_response.get("status") == 200:
+            if "error" not in mmr_response.get('data', {}):
+                try:        
+                    rank_info = RankInfo(**mmr_response['data'])
+                    player_data = player.model_dump()
+                    player_data['rank_info'] = rank_info
+                    return Player(**player_data)
+                except Exception as e:
+                    print(f"Ошибка создания RankInfo: {e}")
+                    return player
+        return player

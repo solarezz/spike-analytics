@@ -14,26 +14,16 @@ async def profile_stat(message: Message):
     
     # Получаем аргументы команды (все после /profile)
     args = message.text.split(maxsplit=1)
-    
-    if len(args) < 2:
-        await message.answer("❌ Неправильный формат! Используйте: /profile name#tag")
+    if len(args) < 2 or "#" not in args[1]:
+        await message.answer("❌ Используйте: /profile name#tag")
         return
     
-    name_tag_str = args[1]
+    name, tag = args[1].split("#", 1)
+
     
-    if "#" not in name_tag_str:
-        await message.answer("❌ Неправильный формат! Используйте: /profile name#tag")
-        return
+    player = client.get_full_player_info(name, tag)
     
-    name_tag = name_tag_str.split("#")
-    
-    if len(name_tag) != 2:
-        await message.answer("❌ Неправильный формат! Используйте: /profile name#tag")
-        return
-    
-    player_data = client.get_player_stats(name_tag[0], name_tag[1])
-    
-    if player_data:
-        await message.answer(str(player_data))
+    if player:
+        await message.answer(player.format_for_telegram())
     else:
         await message.answer("❌ Не удалось получить данные игрока. Проверьте правильность имени и тега.")
