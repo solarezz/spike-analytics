@@ -37,7 +37,7 @@ class Player(BaseModel):
     
     def format_for_telegram(self) -> str:
         base_info = (
-         f"👤 **{self.name}#{self.tag}**\n"
+         f"👤 <b>{self.name}#{self.tag}<b>\n"
          f"🏆 Уровень: {self.account_level}\n"   
         )
         
