@@ -1,19 +1,12 @@
 import os
 from jinja2 import Template
-import imgkit
+from html2image import Html2Image
 
 def get_rank_image_path(rank_name, tier_level=None):
     """
-    Получает путь к изображению ранга
-    
-    Args:
-        rank_name (str): Название ранга (Iron, Bronze, Silver, etc.)
-        tier_level (int): Уровень ранга (1-3) или None для Radiant
-    
-    Returns:
-        str: Путь к изображению
+    Получает абсолютный путь к изображению ранга
     """
-    # Нормализуем название ранга (исправляем опечатки)
+    # Нормализуем название ранга
     rank_mapping = {
         "Iron": "iron",
         "Bronze": "bronze", 
@@ -22,76 +15,38 @@ def get_rank_image_path(rank_name, tier_level=None):
         "Platinum": "platinum",
         "Diamond": "diamond",
         "Immortal": "immortal",
-        "Ascendant": "ascedant",  # Исправлено с Ascendant на ascedant
-        "Ascedant": "ascedant",   # Альтернативное написание
+        "Ascendant": "ascedant",
+        "Ascedant": "ascedant",
         "Radiant": "radiant"
     }
     
-    # Получаем базовое имя файла
     base_name = rank_mapping.get(rank_name, rank_name.lower())
+    
+    # Получаем абсолютный путь к проекту
+    project_root = os.path.dirname(os.path.dirname(__file__))
     
     # Для Radiant всегда один файл
     if base_name == "radiant":
-        return "radiant.png"
+        return os.path.join(project_root, "static", "images", "ranks", f"{base_name}.png")
     
     # Для остальных используем уровень
     if tier_level and tier_level in [1, 2, 3]:
-        return f"{base_name}-{tier_level}.png"
+        return os.path.join(project_root, "static", "images", "ranks", f"{base_name}-{tier_level}.png")
     else:
-        return f"{base_name}-1.png"
-
-def get_rank_classes(rank_name, tier_level):
-    """
-    Получает CSS классы для отображения ранга
-    
-    Args:
-        rank_name (str): Название ранга
-        tier_level (int): Уровень ранга (1-3)
-    
-    Returns:
-        tuple: (wrapper_class, rank_class)
-    """
-    # Нормализуем название ранга
-    normalized_name = rank_name.lower()
-    
-    # Исправляем Ascendant -> Ascedant
-    if normalized_name == "ascendant":
-        normalized_name = "ascedant"
-    
-    # Для Radiant всегда используем один класс
-    if normalized_name == "radiant":
-        return "radiant-crown-wrapper", "radiant-crown"
-    
-    # Для остальных рангов используем уровень
-    if tier_level in [1, 2, 3]:
-        wrapper_class = f"{normalized_name}-rank-wrapper-{tier_level}"
-        rank_class = f"{normalized_name}-rank"
-        return wrapper_class, rank_class
-    
-    # По умолчанию для 1 уровня
-    return f"{normalized_name}-rank-wrapper-1", f"{normalized_name}-rank"
+        return os.path.join(project_root, "static", "images", "ranks", f"{base_name}-1.png")
 
 def parse_rank_info(rank_string):
     """
     Разбирает строку ранга и возвращает название и уровень
-    
-    Args:
-        rank_string (str): Строка ранга, например "Immortal 1"
-    
-    Returns:
-        tuple: (rank_name, tier_level)
     """
     if not rank_string:
         return "Iron", 1
     
-    # Разбиваем строку на части
     parts = rank_string.split()
     
-    # Если только название ранга
     if len(parts) == 1:
         return parts[0], 1
     
-    # Если название + уровень
     rank_name = parts[0]
     try:
         tier_level = int(parts[1])
@@ -104,22 +59,13 @@ def parse_rank_info(rank_string):
 
 def generate_profile_card(player_data):
     """
-    Генерирует карточку профиля как изображение PNG
-    
-    Args:
-        player_data (Player): Объект игрока с данными
-        
-    Returns:
-        bytes: Байты изображения PNG
+    Генерирует карточку профиля как изображение PNG с помощью html2image
     """
     try:
         # Получаем абсолютные пути
         project_root = os.path.dirname(os.path.dirname(__file__))
         template_path = os.path.join(project_root, 'templates', 'profile_card.html')
         static_dir = os.path.join(project_root, 'static')
-        css_dir = os.path.join(static_dir, 'css')
-        images_dir = os.path.join(static_dir, 'images')
-        ranks_dir = os.path.join(images_dir, 'ranks')
         
         # Проверяем существование файлов
         if not os.path.exists(template_path):
@@ -150,9 +96,7 @@ def generate_profile_card(player_data):
             
             template_data.update({
                 'CURRENT_RANK': current_rank,
-                'CURRENT_MMR': rr,  # В шаблоне используется CURRENT_MMR
-                'RANK_WRAPPER_CLASS': get_rank_classes(rank_name, tier_level)[0],
-                'RANK_CLASS': get_rank_classes(rank_name, tier_level)[1],
+                'CURRENT_MMR': rr,
                 'CURRENT_RANK_IMAGE': get_rank_image_path(rank_name, tier_level)
             })
         else:
@@ -160,9 +104,7 @@ def generate_profile_card(player_data):
             template_data.update({
                 'CURRENT_RANK': "Unranked",
                 'CURRENT_MMR': 0,
-                'RANK_WRAPPER_CLASS': "iron-rank-wrapper-1",
-                'RANK_CLASS': "iron-rank",
-                'CURRENT_RANK_IMAGE': "iron-1.png"
+                'CURRENT_RANK_IMAGE': os.path.join(project_root, "static", "images", "ranks", "iron-1.png")
             })
         
         # Данные пикового ранга
@@ -176,8 +118,6 @@ def generate_profile_card(player_data):
             template_data.update({
                 'PEAK_RANK': peak_rank,
                 'PEAK_EPISODE': f"Episode 8 • {season}" if season else "N/A",
-                'PEAK_RANK_WRAPPER_CLASS': get_rank_classes(peak_rank_name, peak_tier_level)[0],
-                'PEAK_RANK_CLASS': get_rank_classes(peak_rank_name, peak_tier_level)[1],
                 'PEAK_RANK_IMAGE': get_rank_image_path(peak_rank_name, peak_tier_level)
             })
         else:
@@ -185,17 +125,15 @@ def generate_profile_card(player_data):
             template_data.update({
                 'PEAK_RANK': "Unranked",
                 'PEAK_EPISODE': "N/A",
-                'PEAK_RANK_WRAPPER_CLASS': "iron-rank-wrapper-1",
-                'PEAK_RANK_CLASS': "iron-rank",
-                'PEAK_RANK_IMAGE': "iron-1.png"
+                'PEAK_RANK_IMAGE': os.path.join(project_root, "static", "images", "ranks", "iron-1.png")
             })
         
-        # Статистика (пока заглушки, позже добавим реальные данные)
+        # Статистика (пока заглушки)
         template_data.update({
-            'MATCHES': 0,  # Позже получим из API
-            'WIN_RATE': 0,  # Позже рассчитаем
-            'KD': 0.0,  # Позже рассчитаем (в шаблоне KD, не KD_RATIO)
-            'AVG': 0  # Позже получим из API (в шаблоне AVG, не AVG_ACS)
+            'MATCHES': 0,
+            'WINRATE': 0,
+            'KD': 0.0,
+            'AVG': 0
         })
         
         # Рендерим HTML с данными
@@ -206,43 +144,55 @@ def generate_profile_card(player_data):
         with open(temp_html_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
         
-        # Настройки для конвертации в изображение
-        options = {
-            'width': '800',
-            'height': '600',
-            'quality': '100',  # Максимальное качество
-            'enable-local-file-access': '',  # Разрешаем доступ к локальным файлам
-            'allow': [project_root],  # Разрешаем доступ ко всему проекту
-            'no-stop-slow-scripts': '',  # Не останавливаем медленные скрипты
-        }
-        
-        # Конвертируем HTML в изображение PNG
-        img_bytes = imgkit.from_file(
-            temp_html_path,
-            False,  # Не сохраняем в файл, возвращаем байты
-            options=options
+        # Используем html2image для конвертации
+        hti = Html2Image(
+            output_path=project_root,
+            custom_flags=[
+                '--no-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--headless=new'
+            ]
         )
         
-        # Удаляем временный файл
+        # Генерируем изображение
+        screenshot = hti.screenshot(
+            html_file=temp_html_path,
+            size=(969,696),
+            save_as='temp_card_screenshot.png'
+        )
+        
+        # Читаем сгенерированное изображение
+        screenshot_path = os.path.join(project_root, 'temp_card_screenshot.png')
+        with open(screenshot_path, 'rb') as f:
+            img_bytes = f.read()
+        
+        # Удаляем временные файлы
         if os.path.exists(temp_html_path):
             os.remove(temp_html_path)
+        if os.path.exists(screenshot_path):
+            os.remove(screenshot_path)
         
         return img_bytes
         
     except Exception as e:
         print(f"Ошибка генерации карточки: {e}")
-        # Удаляем временный файл в случае ошибки
-        temp_html_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'temp_profile_card.html')
+        # Удаляем временные файлы в случае ошибки
+        temp_html_path = os.path.join(project_root, 'temp_profile_card.html')
+        screenshot_path = os.path.join(project_root, 'temp_card_screenshot.png')
+        
         if os.path.exists(temp_html_path):
             os.remove(temp_html_path)
+        if os.path.exists(screenshot_path):
+            os.remove(screenshot_path)
         raise
 
-# Тестовая функция (для отладки)
+# Тестовая функция
 def test_generate_card():
     """
     Тестовая функция для проверки генерации карточки
     """
-    # Создаем тестовые данные (имитация объекта Player)
+    # Создаем тестовые данные
     class TestPlayer:
         def __init__(self):
             self.name = "TestPlayer"

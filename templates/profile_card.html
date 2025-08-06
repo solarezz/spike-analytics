@@ -1,114 +1,561 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta charset="utf-8" />
-    <link rel="stylesheet" href="static/css/globals.css" />
-    <link rel="stylesheet" href="static/css/styleguide.css" />
-    <link rel="stylesheet" href="static/css/style.css" />
-  </head>
-  <body>
-    <div class="element-light">
-      <div class="container">
-        <div class="background-border">
-          <div class="div">
-            <div class="border"></div>
-            <div class="border-2"></div>
-            <div class="border-3"></div>
-          </div>
-          <div class="gradient"></div>
-          <div class="border-4"></div>
-          <div class="border-5"></div>
-          <div class="border-6"></div>
-          <div class="border-7"></div>
-          <div class="horizontal-border">
-            <div class="container-2">
-              <div class="background-shadow"><img class="component" src="static/images/light.svg" /></div>
-              <div class="div-2"><div class="text-wrapper">⚡ SPIKE ANALYTICS</div></div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spike Analytics Gaming Profile</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #0F1419;
+            color: #FFFFFF;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        /* Design system colors */
+        :root {
+            --primary: #FF4655;
+            --accent: #FD4556;
+            --background: #0F1419;
+            --card-bg: rgba(25, 37, 50, 0.5);
+            --gaming-beige: #ECE8E1;
+            --gaming-highlight: #FF6B6B;
+            --border-color: rgba(255, 70, 85, 0.3);
+            --muted: rgba(25, 37, 50, 0.8);
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .title-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--gaming-beige);
+        }
+
+        /* Gaming profile card */
+        .gaming-profile-card {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            background: linear-gradient(135deg, var(--background) 0%, rgba(25, 37, 50, 0.8) 50%, var(--background) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(15, 20, 25, 0.8);
+        }
+
+        /* Background patterns */
+        .bg-patterns {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .pattern-1 {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            width: 8rem;
+            height: 8rem;
+            border: 1px solid rgba(255, 70, 85, 0.2);
+            transform: rotate(45deg);
+        }
+
+        .pattern-2 {
+            position: absolute;
+            bottom: 3rem;
+            left: 3rem;
+            width: 6rem;
+            height: 6rem;
+            border: 1px solid rgba(253, 69, 86, 0.2);
+            transform: rotate(12deg);
+        }
+
+        .pattern-3 {
+            position: absolute;
+            top: 50%;
+            left: 25%;
+            width: 4rem;
+            height: 4rem;
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            transform: rotate(-12deg);
+        }
+
+        /* Header */
+        .header {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-icon {
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(255, 70, 85, 0.6);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.1em;
+        }
+
+        .header-line {
+            margin-top: 1rem;
+            height: 1px;
+            background: linear-gradient(to right, var(--primary), var(--accent), transparent);
+        }
+
+        /* Main content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100% - 120px);
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Card sections */
+        .card-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 0 20px rgba(255, 70, 85, 0.5);
+        }
+
+        .player-info h2 {
+            font-size: 1.875rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+        }
+
+        .player-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gaming-beige);
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .icon {
+            width: 1rem;
+            height: 1rem;
+            fill: currentColor;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gaming-beige);
+            margin-bottom: 1rem;
+        }
+
+        /* Rank sections */
+        .rank-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rank-icon {
+            width: 4rem;
+            height: 4rem;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            box-shadow: 0 0 15px rgba(255, 70, 85, 0.6);
+            animation: gaming-pulse 2s ease-in-out infinite;
+        }
+
+        .rank-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(1.1);
+        }
+
+        .rank-details h4 {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .rank-details p {
+            color: var(--gaming-beige);
+        }
+
+        /* Peak rank special styling */
+        .peak-rank {
+            border-color: rgba(255, 107, 107, 0.3);
+        }
+
+        .peak-rank .rank-icon {
+            background: linear-gradient(135deg, var(--gaming-highlight), var(--accent));
+        }
+
+        .peak-rank h4 {
+            color: var(--gaming-highlight);
+        }
+
+        /* Progress bar */
+        .progress-section {
+            margin-top: 0.5rem;
+        }
+
+        .progress-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--gaming-beige);
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+            position: relative;
+            width: 100%;
+            height: 0.75rem;
+            background: var(--muted);
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: {{CURRENT_MMR}}%; /* Это будет перезаписано inline стилем */
+            background: linear-gradient(90deg, var(--primary), var(--gaming-highlight));
+            border-radius: 9999px;
+            box-shadow: 0 0 15px rgba(255, 70, 85, 0.6);
+            animation: progress-fill 1.5s ease-out;
+        }
+
+        .progress-shimmer {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: pulse 2s infinite;
+        }
+
+        /* Achievement badge */
+        .achievement-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 9999px;
+            color: var(--gaming-highlight);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--gaming-beige);
+        }
+
+        .stat-primary { color: var(--primary); }
+        .stat-accent { color: var(--accent); }
+        .stat-highlight { color: var(--gaming-highlight); }
+
+        /* Corner decorations */
+        .corner-decoration {
+            position: absolute;
+            width: 2rem;
+            height: 2rem;
+            border-color: rgba(255, 70, 85, 0.4);
+        }
+
+        .corner-tl {
+            top: 0;
+            left: 0;
+            border-left: 2px solid;
+            border-top: 2px solid;
+        }
+
+        .corner-tr {
+            top: 0;
+            right: 0;
+            border-right: 2px solid;
+            border-top: 2px solid;
+        }
+
+        .corner-bl {
+            bottom: 0;
+            left: 0;
+            border-left: 2px solid;
+            border-bottom: 2px solid;
+        }
+
+        .corner-br {
+            bottom: 0;
+            right: 0;
+            border-right: 2px solid;
+            border-bottom: 2px solid;
+        }
+
+        /* Bottom accent */
+        .bottom-accent {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+        }
+
+        /* Animations */
+        @keyframes gaming-pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes progress-fill {
+            0% { width: 0%; }
+            100% { width: {{CURRENT_MMR}}%; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .description {
+            text-align: center;
+            margin-top: 2rem;
+            color: var(--gaming-beige);
+            max-width: 32rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="gaming-profile-card">
+            <!-- Background patterns -->
+            <div class="bg-patterns">
+                <div class="pattern-1"></div>
+                <div class="pattern-2"></div>
+                <div class="pattern-3"></div>
             </div>
-            <div class="horizontal-divider"></div>
-          </div>
-          <div class="container-3">
-            <div class="container-4">
-              <div class="overlay-border">
-                <div class="container-5">
-                  <div class="div-wrapper"><div class="text-wrapper-2">{{PLAYER_NAME}}#{{PLAYER_TAG}}</div></div>
-                  <div class="container-6">
-                    <div class="container-7">
-                      <img class="img" src="static/images/location.svg" />
-                      <div class="div-2"><div class="text-wrapper-3">{{REGION}}</div></div>
+
+            <!-- Header -->
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-icon">
+                        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="13,2 3,14 12,14 11,22 21,10 12,10"></polygon>
+                        </svg>
                     </div>
-                    <div class="container-7">
-                      <img class="img" src="static/images/star.svg" />
-                      <div class="div-2"><div class="text-wrapper-4">Level {{LEVEL}}</div></div>
-                    </div>
-                  </div>
+                    <h1 class="header-title">⚡ SPIKE ANALYTICS</h1>
                 </div>
-              </div>
-              <div class="overlay-border-2">
-                <div class="div-wrapper"><div class="text-wrapper-5">CURRENT RANK</div></div>
-                <div class="container-6">
-                  <div class="{{RANK_WRAPPER_CLASS}}">
-                    <div class="{{RANK_CLASS}}" style="background-image: url({{CURRENT_RANK_IMAGE}});"></div>
-                  </div>
-                  <div class="div-2">
-                    <div class="div-wrapper"><div class="text-wrapper-6">{{CURRENT_RANK}}</div></div>
-                    <div class="div-wrapper"><div class="text-wrapper-7">{{CURRENT_MMR}} / 100 RR</div></div>
-                  </div>
-                </div>
-                <div class="container-8">
-                  <div class="container-9">
-                    <div class="container-10"><div class="text-wrapper-8">Rank Rating</div></div>
-                    <div class="container-10"><div class="text-wrapper-9">{{CURRENT_MMR}}%</div></div>
-                  </div>
-                  <div class="background">
-                    <div class="overlap-group">
-                      <div class="gradient-shadow"></div>
-                      <div class="gradient-2"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                <div class="header-line"></div>
             </div>
-            <div class="container-4">
-              <div class="overlay-border-3">
-                <div class="div-wrapper"><div class="text-wrapper-5">PEAK RANK</div></div>
-                <div class="container-6">
-                  <div class="{{PEAK_RANK_WRAPPER_CLASS}}">
-                    <div class="{{PEAK_RANK_CLASS}}" style="background-image: url({{PEAK_RANK_IMAGE}});"></div>
-                  </div>
-                  <div class="div-2">
-                    <div class="div-wrapper"><div class="text-wrapper-10">{{PEAK_RANK}}</div></div>
-                    <div class="div-wrapper"><div class="text-wrapper-11">{{PEAK_EPISODE}}</div></div>
-                  </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Left Column -->
+                <div class="column">
+                    <!-- Player Info -->
+                    <div class="card-section player-info">
+                        <h2>{{PLAYER_NAME}}#{{PLAYER_TAG}}</h2>
+                        <div class="player-details">
+                            <div class="detail-item">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                    <circle cx="12" cy="10" r="3"></circle>
+                                </svg>
+                                <span>{{REGION}}</span>
+                            </div>
+                            <div class="detail-item">
+                                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"></polygon>
+                                </svg>
+                                <span>Level {{LEVEL}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Rank -->
+                    <div class="card-section">
+                        <h3 class="section-title">CURRENT RANK</h3>
+                        <div class="rank-info">
+                            <div class="rank-icon">
+                                <img src="{{CURRENT_RANK_IMAGE}}" alt="Immortal Rank">
+                            </div>
+                            <div class="rank-details">
+                                <h4>{{CURRENT_RANK}}</h4>
+                                <p>{{CURRENT_MMR}} / 100 RR</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Простой прогресс-бар -->
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.875rem; color: #ECE8E1; margin-bottom: 0.5rem;">
+                                <span>Rank Rating</span>
+                                <span>{{CURRENT_MMR}}%</span>
+                            </div>
+                            <div style="width: 100%; height: 12px; background-color: #192532; border-radius: 6px; overflow: hidden;">
+                                <div style="width: {{CURRENT_MMR}}%; height: 100%; background: linear-gradient(90deg, #FF4655, #FD4556);"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="overlay-border-4">
-                  <img class="img" src="static/images/crown.svg" />
-                  <div class="div-2"><div class="text-wrapper-12">Peak Achievement</div></div>
+
+                <!-- Right Column -->
+                <div class="column">
+                    <!-- Peak Rank -->
+                    <div class="card-section peak-rank">
+                        <h3 class="section-title">PEAK RANK</h3>
+                        <div class="rank-info">
+                            <div class="rank-icon">
+                                <img src="{{PEAK_RANK_IMAGE}}" alt="Radiant Crown">
+                            </div>
+                            <div class="rank-details">
+                                <h4>{{PEAK_RANK}}</h4>
+                                <p>{{PEAK_EPISODE}}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="achievement-badge">
+                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                                <path d="M4 22h16"></path>
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                            </svg>
+                            <span>Peak Achievement</span>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value stat-primary">{{MATCHES}}</div>
+                            <div class="stat-label">Matches</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value stat-accent">{{WINRATE}}%</div>
+                            <div class="stat-label">Win Rate</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value stat-highlight">{{KD}}</div>
+                            <div class="stat-label">K/D Ratio</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{AVG}}</div>
+                            <div class="stat-label">Avg ACS</div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="container-11">
-                <div class="overlay-border-5">
-                  <div class="container-12"><div class="text-wrapper-13">{{MATCHES}}</div></div>
-                  <div class="container-12"><div class="text-wrapper-14">Matches</div></div>
-                </div>
-                <div class="overlay-border-6">
-                  <div class="container-12"><div class="text-wrapper-15">{{WIN_RATE}}%</div></div>
-                  <div class="container-12"><div class="text-wrapper-16">Win Rate</div></div>
-                </div>
-                <div class="overlay-border-7">
-                  <div class="container-12"><div class="text-wrapper-17">{{KD}}</div></div>
-                  <div class="container-12"><div class="text-wrapper-16">K/D Ratio</div></div>
-                </div>
-                <div class="overlay-border-8">
-                  <div class="container-12"><div class="text-wrapper-18">{{AVG}}</div></div>
-                  <div class="container-12"><div class="text-wrapper-19">Avg ACS</div></div>
-                </div>
-              </div>
             </div>
-          </div>
+
+            <!-- Corner decorations -->
+            <div class="corner-decoration corner-tl"></div>
+            <div class="corner-decoration corner-tr"></div>
+            <div class="corner-decoration corner-bl"></div>
+            <div class="corner-decoration corner-br"></div>
+
+            <!-- Bottom accent line -->
+            <div class="bottom-accent"></div>
         </div>
-      </div>
     </div>
-  </body>
+</body>
 </html>
