@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="static/css/globals.css" />
+    <link rel="stylesheet" href="static/css/styleguide.css" />
+    <link rel="stylesheet" href="static/css/style.css" />
+  </head>
+  <body>
+    <div class="element-light">
+      <div class="container">
+        <div class="background-border">
+          <div class="div">
+            <div class="border"></div>
+            <div class="border-2"></div>
+            <div class="border-3"></div>
+          </div>
+          <div class="gradient"></div>
+          <div class="border-4"></div>
+          <div class="border-5"></div>
+          <div class="border-6"></div>
+          <div class="border-7"></div>
+          <div class="horizontal-border">
+            <div class="container-2">
+              <div class="background-shadow"><img class="component" src="static/images/light.svg" /></div>
+              <div class="div-2"><div class="text-wrapper">⚡ SPIKE ANALYTICS</div></div>
+            </div>
+            <div class="horizontal-divider"></div>
+          </div>
+          <div class="container-3">
+            <div class="container-4">
+              <div class="overlay-border">
+                <div class="container-5">
+                  <div class="div-wrapper"><div class="text-wrapper-2">{{PLAYER_NAME}}#{{PLAYER_TAG}}</div></div>
+                  <div class="container-6">
+                    <div class="container-7">
+                      <img class="img" src="static/images/location.svg" />
+                      <div class="div-2"><div class="text-wrapper-3">{{REGION}}</div></div>
+                    </div>
+                    <div class="container-7">
+                      <img class="img" src="static/images/star.svg" />
+                      <div class="div-2"><div class="text-wrapper-4">Level {{LEVEL}}</div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="overlay-border-2">
+                <div class="div-wrapper"><div class="text-wrapper-5">CURRENT RANK</div></div>
+                <div class="container-6">
+                  <div class="{{RANK_WRAPPER_CLASS}}">
+                    <div class="{{RANK_CLASS}}" style="background-image: url({{CURRENT_RANK_IMAGE}});"></div>
+                  </div>
+                  <div class="div-2">
+                    <div class="div-wrapper"><div class="text-wrapper-6">{{CURRENT_RANK}}</div></div>
+                    <div class="div-wrapper"><div class="text-wrapper-7">{{CURRENT_MMR}} / 100 RR</div></div>
+                  </div>
+                </div>
+                <div class="container-8">
+                  <div class="container-9">
+                    <div class="container-10"><div class="text-wrapper-8">Rank Rating</div></div>
+                    <div class="container-10"><div class="text-wrapper-9">{{CURRENT_MMR}}%</div></div>
+                  </div>
+                  <div class="background">
+                    <div class="overlap-group">
+                      <div class="gradient-shadow"></div>
+                      <div class="gradient-2"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="container-4">
+              <div class="overlay-border-3">
+                <div class="div-wrapper"><div class="text-wrapper-5">PEAK RANK</div></div>
+                <div class="container-6">
+                  <div class="{{PEAK_RANK_WRAPPER_CLASS}}">
+                    <div class="{{PEAK_RANK_CLASS}}" style="background-image: url({{PEAK_RANK_IMAGE}});"></div>
+                  </div>
+                  <div class="div-2">
+                    <div class="div-wrapper"><div class="text-wrapper-10">{{PEAK_RANK}}</div></div>
+                    <div class="div-wrapper"><div class="text-wrapper-11">{{PEAK_EPISODE}}</div></div>
+                  </div>
+                </div>
+                <div class="overlay-border-4">
+                  <img class="img" src="static/images/crown.svg" />
+                  <div class="div-2"><div class="text-wrapper-12">Peak Achievement</div></div>
+                </div>
+              </div>
+              <div class="container-11">
+                <div class="overlay-border-5">
+                  <div class="container-12"><div class="text-wrapper-13">{{MATCHES}}</div></div>
+                  <div class="container-12"><div class="text-wrapper-14">Matches</div></div>
+                </div>
+                <div class="overlay-border-6">
+                  <div class="container-12"><div class="text-wrapper-15">{{WIN_RATE}}%</div></div>
+                  <div class="container-12"><div class="text-wrapper-16">Win Rate</div></div>
+                </div>
+                <div class="overlay-border-7">
+                  <div class="container-12"><div class="text-wrapper-17">{{KD}}</div></div>
+                  <div class="container-12"><div class="text-wrapper-16">K/D Ratio</div></div>
+                </div>
+                <div class="overlay-border-8">
+                  <div class="container-12"><div class="text-wrapper-18">{{AVG}}</div></div>
+                  <div class="container-12"><div class="text-wrapper-19">Avg ACS</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
