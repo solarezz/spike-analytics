@@ -15,7 +15,7 @@ class HenrikAPIClient:
         headers = {"Authorization": self.api_key,"Accept":"*/*"}
         
         try: 
-            async with asyncio.wait_for(aiohttp.ClientSession().get(url, headers=headers, params=params), timeout=10.0) as session:
+            async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers, params=params) as response:
                     if response.status == 404:
                         return None, APIError.PLAYER_NOT_FOUND
@@ -61,7 +61,7 @@ class HenrikAPIClient:
     
     async def get_full_player_info(self, name: str, tag: str) -> tuple[Optional[Player], Optional[APIError]]:
         player_data, error = await self._make_requests(f"v1/account/{name}/{tag}")
-        if not error:
+        if error:
             return None, error
         
         if not player_data or player_data.get('status') != 200:

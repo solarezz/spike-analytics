@@ -12,15 +12,22 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            display: block;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 800px;
+            height: 600px;
+            overflow: hidden !important;
+        }
+
         body {
-            background-color: #0F1419;
+            background-color: transparent;
             color: #FFFFFF;
             font-family: 'Arial', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         /* Design system colors */
@@ -64,7 +71,10 @@
 
         /* Gaming profile card */
         .gaming-profile-card {
-            position: relative;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 800px;
             height: 600px;
             background: linear-gradient(135deg, var(--background) 0%, rgba(25, 37, 50, 0.8) 50%, var(--background) 100%);
@@ -72,6 +82,8 @@
             border-radius: 0.5rem;
             overflow: hidden;
             box-shadow: 0 10px 30px -10px rgba(15, 20, 25, 0.8);
+            margin: 0;
+            padding: 0;
         }
 
         /* Background patterns */
@@ -425,8 +437,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="gaming-profile-card">
+    <div class="gaming-profile-card">
             <!-- Background patterns -->
             <div class="bg-patterns">
                 <div class="pattern-1"></div>
@@ -556,6 +567,5 @@
             <!-- Bottom accent line -->
             <div class="bottom-accent"></div>
         </div>
-    </div>
 </body>
 </html>

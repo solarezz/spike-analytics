@@ -1,13 +1,26 @@
+import os
+import re
+from pathlib import Path
 from api.clients.henrik_client import HenrikAPIClient
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 from aiogram import Router, F
 from aiogram.filters import Command
 from decouple import config
 from bot.utils.validation import validate_riot_id, get_error_message, APIError
+from bot.create_bot import all_media_dir
+import utils.card_generator as CardGen
 
 client = HenrikAPIClient(api_key=config("HENRIK_API"))
 
 profile_router = Router()
+
+def sanitize_filename(name: str) -> str:
+    """Заменяет пробелы на подчеркивания и удаляет опасные символы"""
+    # Сохраняем пробелы, заменяя их на подчеркивания
+    name = name.replace(' ', '_')
+    # Удаляем только действительно опасные символы для файловых систем
+    name = re.sub(r'[<>:"/\\|?*\0]', '', name)
+    return name
 
 @profile_router.message(Command("profile"))
 async def profile_stat(message: Message):
@@ -36,13 +49,30 @@ async def profile_stat(message: Message):
         
         await loading_msg.delete()
 
+        print(player)
         
         if error:
             await message.answer(get_error_message(error))
             return
         
         if player:
-            await message.answer(player.format_for_telegram())
+            safe_name = sanitize_filename(name)
+            filename = f"{safe_name}-{tag}.png"
+            output_path = Path(all_media_dir) / filename
+            img_bytes = CardGen.generate_profile_card(player)
+            try:
+                with open(output_path, 'wb') as f:
+                    f.write(img_bytes)
+                
+                # Отправляем фото
+                photo_file = FSInputFile(path=output_path)
+                await message.answer_photo(photo=photo_file)
+                await message.answer(player.format_for_telegram())
+                
+            finally:
+                # Удаляем временный файл
+                if output_path.exists():
+                    output_path.unlink()
         else:
             await message.answer("❌ Не удалось получить данные игрока.")
             
