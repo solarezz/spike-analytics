@@ -2,6 +2,7 @@ import os
 import re
 from jinja2 import Template
 from html2image import Html2Image
+from PIL import Image, ImageOps
 
 def get_rank_image_path(rank_name, tier_level=None):
     rank_mapping = {
@@ -50,9 +51,63 @@ def parse_rank_info(rank_string):
 
 
 def sanitize_filename(name: str) -> str:
-    """Заменяет пробелы на подчеркивания и удаляет опасные символы"""
     name = name.replace(' ', '_')
     return re.sub(r'[<>:"/\\|?*\0]', '', name)
+
+def crop_white_space(image_path, target_size=(800, 600)):
+    try:
+        with Image.open(image_path) as img:
+            if img.mode != 'RGB':
+                if img.mode == 'RGBA':
+                    background = Image.new('RGB', img.size, (255, 255, 255))
+                    background.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+                    img = background
+                else:
+                    img = img.convert('RGB')
+
+            import numpy as np
+            img_array = np.array(img)
+
+            threshold = 250
+            mask = np.any(img_array < threshold, axis=2)
+
+            if np.any(mask):
+                rows = np.any(mask, axis=1)
+                cols = np.any(mask, axis=0)
+                
+                top = np.argmax(rows)
+                bottom = len(rows) - np.argmax(rows[::-1]) - 1
+                left = np.argmax(cols)
+                right = len(cols) - np.argmax(cols[::-1]) - 1
+
+                bbox = (left, top, right + 1, bottom + 1)
+                cropped = img.crop(bbox)
+ 
+                cropped = cropped.resize(target_size, Image.Resampling.LANCZOS)
+
+                from PIL import ImageFilter, ImageEnhance
+
+                enhancer = ImageEnhance.Sharpness(cropped)
+                cropped = enhancer.enhance(1.2)
+
+                enhancer = ImageEnhance.Contrast(cropped)
+                cropped = enhancer.enhance(1.1)
+
+                final_img = Image.new('RGB', target_size, (255, 255, 255))
+
+                final_img.paste(cropped, (0, 0))
+
+                final_img.save(image_path, 'PNG', optimize=False, compress_level=1)
+
+                return True
+            else:
+                return False
+            
+    except Exception as e:
+        print(f"Ошибка при обрезке изображения: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 def generate_profile_card(player_data):
     try:
@@ -67,8 +122,7 @@ def generate_profile_card(player_data):
             template_content = f.read()
 
         template = Template(template_content)
-        
-        # Подготавливаем данные для шаблона
+
         template_data = {
             'PLAYER_NAME': player_data.name,
             'PLAYER_TAG': player_data.tag,
@@ -102,7 +156,7 @@ def generate_profile_card(player_data):
             
             template_data.update({
                 'PEAK_RANK': peak_rank,
-                'PEAK_EPISODE': f"Episode 8 • {season}" if season else "N/A",
+                'PEAK_EPISODE': f"{season}" if season else "N/A",
                 'PEAK_RANK_IMAGE': get_rank_image_path(peak_rank_name, peak_tier_level)
             })
         else:
@@ -126,35 +180,48 @@ def generate_profile_card(player_data):
         temp_html_path = os.path.join(project_root, f'temp_{name}_{player_data.tag}.html')
         with open(temp_html_path, 'w', encoding='utf-8') as f:
             f.write(html_content)
-        
-        # Используем html2image для конвертации
+
         hti = Html2Image(
-            output_path=project_root
+            output_path=project_root,
+            browser='chrome',
+            custom_flags=[
+                '--no-sandbox', 
+                '--disable-dev-shm-usage', 
+                '--hide-scrollbars',
+                '--disable-web-security',
+                '--allow-running-insecure-content',
+                '--force-device-scale-factor=3',
+                '--disable-gpu-sandbox',
+                '--disable-extensions',
+                '--no-first-run',
+                '--headless'
+            ]
         )
         
         
         output_filename = f'{name}-{player_data.tag}.png'
         output_path = os.path.join(project_root, output_filename)
-        
-        # Генерируем изображение
+
         screenshot = hti.screenshot(
             html_file=temp_html_path,
-            size=(800,600),
+            size=(2400, 1800),
             save_as=output_filename
         )
 
-        # Читаем сгенерированное изображение
+        crop_success = crop_white_space(output_path, (800, 600))
+        
+        if not crop_success:
+            print("Предупреждение: не удалось обрезать белое пространство")
+
         with open(output_path, 'rb') as f:
             img_bytes = f.read()
-        
-        # Удаляем временные файлы
+
         os.remove(temp_html_path)
         
         return img_bytes
         
     except Exception as e:
         print(f"Ошибка генерации карточки: {e}")
-        # Удаляем временные файлы в случае ошибки
         temp_html_path = os.path.join(project_root, 'temp_profile_card.html')
         screenshot_path = os.path.join(project_root, 'temp_card_screenshot.png')
         
@@ -164,12 +231,8 @@ def generate_profile_card(player_data):
             os.remove(screenshot_path)
         raise
 
-# Тестовая функция
 def test_generate_card():
-    """
-    Тестовая функция для проверки генерации карточки
-    """
-    # Создаем тестовые данные
+
     class TestPlayer:
         def __init__(self):
             self.name = "TestPlayer"
@@ -190,13 +253,10 @@ def test_generate_card():
                 highest_rank = TestHighestRank()
             
             self.rank_info = TestRankInfo()
-    
-    # Генерируем карточку
     try:
         player = TestPlayer()
         img_bytes = generate_profile_card(player)
-        
-        # Сохраняем для проверки
+
         with open("test_card.png", "wb") as f:
             f.write(img_bytes)
         
@@ -207,5 +267,4 @@ def test_generate_card():
         return False
 
 if __name__ == "__main__":
-    # Запуск теста
     test_generate_card()
