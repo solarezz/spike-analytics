@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  spike-analytics:
+    build: .
+    container_name: spike-analytics-bot
+    restart: unless-stopped
+    environment:
+      # Переменные окружения берутся из .env файла
+      - TG_TOKEN=${TG_TOKEN}
+    volumes:
+      # Подключаем .env файл
+      - .env:/app/.env
+      # Временная папка для файлов (опционально)
+      - ./temp:/app/temp
+    # Если нужны порты для вебхуков
+    # ports:
+    #   - "8000:8000"
+    
+    # Настройки для Chrome в Docker
+    security_opt:
+      - seccomp:unconfined
+    shm_size: 2g
+    
+    # Здоровье контейнера
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; print('Bot is healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

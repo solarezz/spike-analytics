@@ -141,6 +141,17 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
         chrome_options.add_argument('--force-device-scale-factor=1')
         chrome_options.add_argument('--disable-extensions')
         
+        # Дополнительные опции для Docker
+        chrome_options.add_argument('--disable-features=VizDisplayCompositor')
+        chrome_options.add_argument('--remote-debugging-port=9222')
+        chrome_options.add_argument('--no-first-run')
+        chrome_options.add_argument('--disable-default-apps')
+        
+        # Если в Docker, используем переменные окружения
+        if os.getenv('CHROME_OPTIONS'):
+            for option in os.getenv('CHROME_OPTIONS').split():
+                chrome_options.add_argument(option)
+        
         # Создаем временный HTML файл
         with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False, encoding='utf-8') as f:
             f.write(rendered_html)
