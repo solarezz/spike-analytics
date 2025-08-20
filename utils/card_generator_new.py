@@ -70,45 +70,26 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
         # Подготавливаем данные для шаблона
         rank_name, tier_level = parse_rank_info(enhanced_stats.get('current_rank', 'Unranked'))
         peak_rank_name, peak_tier_level = parse_rank_info(enhanced_stats.get('peak_rank', 'Unranked'))
-        
-        # Отладочная информация
-        current_rank_image = get_rank_image_path(rank_name, tier_level)
-        peak_rank_image = get_rank_image_path(peak_rank_name, peak_tier_level)
-        
-        print(f"🔍 Current rank: {rank_name} (tier {tier_level}) -> {current_rank_image}")
-        print(f"🔍 Peak rank: {peak_rank_name} (tier {peak_tier_level}) -> {peak_rank_image}")
-        print(f"🔍 Files exist: current={os.path.exists(current_rank_image)}, peak={os.path.exists(peak_rank_image)}")
-        print(f"🔍 Player name: {riot_id}#{tagline}")
-        print(f"🔍 Stats: Matches={enhanced_stats.get('matches_played', 0)}, Win Rate={enhanced_stats.get('win_rate', '0%')}")
-        print(f"🔍 Combat: K/D={enhanced_stats.get('kd_ratio', 0.0)}, Kills={enhanced_stats.get('kills', 0)}")
 
-        # Формируем полные названия рангов с номерами
-        full_current_rank = f"{rank_name} {tier_level}" if tier_level and rank_name != "Unranked" else rank_name
-        full_peak_rank = f"{peak_rank_name} {peak_tier_level}" if peak_tier_level and peak_rank_name != "Unranked" else peak_rank_name
-        
         template_data = {
-            'PLAYER_NAME': f"{riot_id}#{tagline}",  # Добавляем имя игрока
             'RIOT_ID': riot_id,
             'TAGLINE': tagline,
             'REGION': enhanced_stats.get('region', 'N/A'),
             'LEVEL': enhanced_stats.get('account_level', 'N/A'),
-            'CURRENT_RANK': full_current_rank,  # Теперь включает номер
+            'CURRENT_RANK': rank_name,
             'CURRENT_TIER_LEVEL': tier_level,
             'CURRENT_RR': enhanced_stats.get('current_rr', 0),
-            'CURRENT_MMR': enhanced_stats.get('current_rr', 0),  # Добавляем для совместимости с шаблоном
-            'PEAK_RANK': full_peak_rank,  # Теперь включает номер
+            'PEAK_RANK': peak_rank_name,
             'PEAK_TIER_LEVEL': peak_tier_level,
-            'CURRENT_RANK_IMAGE': current_rank_image,  # Используем переменную
-            'PEAK_RANK_IMAGE': peak_rank_image,  # Используем переменную
-            'MATCHES': enhanced_stats.get('matches_played', 0),  # Исправлено имя поля
-            'WINS': enhanced_stats.get('matches_won', 0),  # Исправлено имя поля
-            'LOSSES': enhanced_stats.get('matches_lost', 0),  # Исправлено имя поля
-            'WIN_RATE': enhanced_stats.get('win_rate', '0%').replace('%', ''),  # Убираем % для числового значения
-            'WINRATE': enhanced_stats.get('win_rate', '0%').replace('%', ''),  # Добавляем для совместимости с шаблоном
+            'CURRENT_RANK_IMG': get_rank_image_path(enhanced_stats.get('current_rank', 'Unranked')),
+            'PEAK_RANK_IMG': get_rank_image_path(enhanced_stats.get('peak_rank', 'Unranked')),
+            'MATCHES': enhanced_stats.get('matches', 0),
+            'WINS': enhanced_stats.get('wins', 0),
+            'LOSSES': enhanced_stats.get('losses', 0),
+            'WIN_RATE': enhanced_stats.get('win_rate', 0),
             'KILLS': enhanced_stats.get('kills', 0),
             'DEATHS': enhanced_stats.get('deaths', 0),
             'ASSISTS': enhanced_stats.get('assists', 0),
-            'KD': enhanced_stats.get('kd_ratio', 0.0),  # Исправлено имя поля
             'DAMAGE_PER_ROUND': enhanced_stats.get('damage_per_round', 0),
             'HEADSHOT_PCT': enhanced_stats.get('headshot_pct', 0),
             'MVPS': enhanced_stats.get('mvps', 0),
@@ -135,7 +116,7 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--window-size=1300,1000')  # Увеличиваем для 1200x900 карточки
+        chrome_options.add_argument('--window-size=900,700')
         chrome_options.add_argument('--hide-scrollbars')
         chrome_options.add_argument('--disable-web-security')
         chrome_options.add_argument('--force-device-scale-factor=1')
@@ -149,7 +130,7 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
         try:
             # Запускаем Chrome
             driver = webdriver.Chrome(options=chrome_options)
-            driver.set_window_size(1300, 1000)  # Увеличиваем для 1200x900 карточки
+            driver.set_window_size(900, 700)
             
             # Загружаем HTML файл
             driver.get(f'file://{temp_html_path.replace(os.sep, "/")}')
