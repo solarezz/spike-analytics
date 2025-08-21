@@ -35,10 +35,15 @@ def get_rank_image_path(rank_name, tier_level=None):
         return os.path.join(project_root, "static", "images", "ranks", f"{base_name}-1.png")
 
 def parse_rank_info(rank_str):
-    if not rank_str or rank_str == "Unranked":
+    # Проверяем на None и пустые значения
+    if not rank_str or rank_str == "Unranked" or rank_str is None:
         return "Unranked", 1
     
     try:
+        # Дополнительная проверка на тип
+        if not isinstance(rank_str, str):
+            return "Unranked", 1
+            
         parts = rank_str.split()
         if len(parts) >= 2 and parts[-1].isdigit():
             tier_level = int(parts[-1])
@@ -46,8 +51,9 @@ def parse_rank_info(rank_str):
             return rank_name, tier_level
         else:
             return rank_str, 1
-    except ValueError:
-        return rank_str, 1
+    except (ValueError, AttributeError, TypeError) as e:
+        print(f"⚠️ Ошибка парсинга ранга '{rank_str}': {e}")
+        return "Unranked", 1
 
 def sanitize_filename(name: str) -> str:
     name = name.replace(' ', '_')
@@ -56,6 +62,11 @@ def sanitize_filename(name: str) -> str:
 async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id: str, tagline: str, output_filename: str = None):
     """Генерация карточки через selenium (рекомендуемый метод)"""
     try:
+        # Проверяем входные данные
+        if not enhanced_stats or not isinstance(enhanced_stats, dict):
+            print(f"❌ Неверные данные enhanced_stats: {enhanced_stats}")
+            return None
+            
         from selenium import webdriver
         from selenium.webdriver.chrome.options import Options
         
@@ -67,9 +78,12 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
 
         template = Template(template_content)
 
-        # Подготавливаем данные для шаблона
-        rank_name, tier_level = parse_rank_info(enhanced_stats.get('current_rank', 'Unranked'))
-        peak_rank_name, peak_tier_level = parse_rank_info(enhanced_stats.get('peak_rank', 'Unranked'))
+        # Подготавливаем данные для шаблона с безопасным извлечением
+        current_rank = enhanced_stats.get('current_rank') if enhanced_stats else None
+        peak_rank = enhanced_stats.get('peak_rank') if enhanced_stats else None
+        
+        rank_name, tier_level = parse_rank_info(current_rank)
+        peak_rank_name, peak_tier_level = parse_rank_info(peak_rank)
         
         # Отладочная информация
         current_rank_image = get_rank_image_path(rank_name, tier_level)

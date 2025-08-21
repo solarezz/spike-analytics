@@ -79,7 +79,26 @@ class TrackerGGAPI:
                 all_agents.append(segment)
         
         if not current_season:
-            return None
+            print("❌ Не найден current_season сегмент")
+            print(f"🔍 Доступные сегменты: {[s.get('type') for s in segments]}")
+            # Возвращаем базовую структуру с минимальными данными
+            return {
+                'riot_id': riot_id,
+                'tagline': tagline,
+                'region': 'N/A',
+                'account_level': 'N/A',
+                'current_rank': 'Unranked',
+                'matches_played': 0,
+                'matches_won': 0,
+                'win_rate': 0,
+                'kills': 0,
+                'deaths': 0,
+                'assists': 0,
+                'kd_ratio': 0,
+                'damage_per_round': 0,
+                'headshot_pct': 0,
+                'favorite_agent': 'Unknown'
+            }
             
         # Находим агента с наибольшим количеством матчей
         favorite_agent = None
@@ -93,9 +112,6 @@ class TrackerGGAPI:
                     max_matches = matches_played
                     favorite_agent = agent_segment
         
-        if not current_season:
-            return None
-            
         # Извлекаем основную статистику
         stats = current_season.get('stats', {})
         
