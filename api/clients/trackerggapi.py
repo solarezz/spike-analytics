@@ -48,8 +48,13 @@ class TrackerGGAPI:
     async def get_enhanced_player_stats(self, riot_id: str, tagline: str) -> Optional[Dict]:
         """Получить обработанную статистику игрока для карточки"""
         
+        print(f"🔍 get_enhanced_player_stats вызван для {riot_id}#{tagline}")
+        
         raw_data = await self.get_player_profile(riot_id, tagline)
+        print(f"📊 get_player_profile завершен, данные получены: {bool(raw_data)}")
+        
         if not raw_data or 'data' not in raw_data:
+            print(f"❌ Нет raw_data или ключа data")
             return None
             
         segments = raw_data['data'].get('segments', [])
@@ -226,6 +231,7 @@ class TrackerGGAPI:
         print(f"🌩️ Попытка получения через CloudScraper: {riot_id}#{tagline}")
         
         # Сначала пробуем обычный httpx
+        print(f"🔄 Пробуем httpx...")
         httpx_result = await self._try_httpx(riot_id, tagline)
         if httpx_result:
             print("✅ Успех через обычный httpx!")
@@ -271,15 +277,16 @@ class TrackerGGAPI:
         def cloudscraper_sync(riot_id: str, tagline: str) -> Optional[Dict]:
             """Синхронная функция для CloudScraper"""
             try:
+                print(f"🔧 CloudScraper начинает работу...")
                 # URL-кодируем для поддержки кириллицы
                 encoded_riot_id = urllib.parse.quote(riot_id, safe='')
                 encoded_tagline = urllib.parse.quote(tagline, safe='')
                 
                 # Сначала посещаем главную страницу для получения cookies
                 main_url = f"https://tracker.gg/valorant/profile/riot/{encoded_riot_id}%23{encoded_tagline}/overview"
-                print(f"🌐 CloudScraper: посещение главной страницы")
+                print(f"🌐 CloudScraper: посещение главной страницы {main_url}")
                 
-                main_response = self.cloud_scraper.get(main_url)
+                main_response = self.cloud_scraper.get(main_url, timeout=10)
                 print(f"📄 CloudScraper главная страница: {main_response.status_code}")
                 
                 if main_response.status_code != 200:
@@ -301,7 +308,7 @@ class TrackerGGAPI:
                 api_url = f"{self.BASE_URL}/profile/riot/{encoded_riot_id}%23{encoded_tagline}"
                 print(f"🔗 CloudScraper API: {api_url}")
                 
-                api_response = self.cloud_scraper.get(api_url)
+                api_response = self.cloud_scraper.get(api_url, timeout=10)
                 print(f"📡 CloudScraper API ответ: {api_response.status_code}")
                 print(f"📋 Content-Type: {api_response.headers.get('content-type', 'unknown')}")
                 print(f"🔧 Content-Encoding: {api_response.headers.get('content-encoding', 'none')}")
@@ -401,9 +408,19 @@ class TrackerGGAPI:
                 traceback.print_exc()
                 return None
         
-        # Запускаем CloudScraper в отдельном потоке
+        # Запускаем CloudScraper в отдельном потоке с timeout
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(None, cloudscraper_sync, riot_id, tagline)
+        try:
+            return await asyncio.wait_for(
+                loop.run_in_executor(None, cloudscraper_sync, riot_id, tagline),
+                timeout=30.0  # 30 секунд timeout
+            )
+        except asyncio.TimeoutError:
+            print("⏰ CloudScraper timeout - операция заняла более 30 секунд")
+            return None
+        except Exception as e:
+            print(f"💥 CloudScraper executor ошибка: {e}")
+            return None
     
     def extract_current_season_stats(self, profile_data: Dict, current_rank: str = None) -> Dict:
         """Извлечь статистику текущего сезона"""
@@ -606,7 +623,7 @@ class TrackerGGAPI:
             'account_level': metadata.get('accountLevel', 0),
             'region': metadata.get('activeShard', ''),
             'profile_views': user_info.get('pageviews', 0),
-            'badges_count': len(user_info.get('badges', [])),
+            'badges_count': len(user_info.get('badges') or []),  # Исправлено: защита от None
             'current_season': current_stats,
             'top_agents': top_agents,
             'clutch_master': clutch_stats,

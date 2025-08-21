@@ -53,29 +53,43 @@ async def profile_stat(message: Message):
 
         riot_id, tagline = validation_result
         
+        print(f"🚀 Обработка профиля: {riot_id}#{tagline}")
+        
         # Показываем сообщение о загрузке
         loading_msg = await message.answer(f"🔍 Создаю карточку для {riot_id}#{tagline}...")
         
+        print(f"📨 Сообщение о загрузке отправлено")
+        
         # Генерируем карточку
+        print(f"🎯 Начинаем генерацию карточки...")
         card_path = await CardGen.generate_enhanced_profile_card(riot_id, tagline)
+        
+        print(f"📋 Результат генерации: {card_path}")
             
         if not card_path or not os.path.exists(card_path):
             await loading_msg.edit_text("❌ Не удалось создать карточку. Возможно, игрок не найден или нет данных.")
             return
         
         # Получаем данные для caption
+        print(f"📊 Получаем данные для caption...")
         tracker_api = TrackerGGAPI()
         profile_data = await tracker_api.get_player_profile(riot_id, tagline)
         
+        print(f"📊 Profile data получен: {bool(profile_data)}")
+        
         if profile_data:
+            print(f"📊 Вызываем get_player_summary...")
             summary = tracker_api.get_player_summary(profile_data)
+            print(f"📊 Summary получен: {bool(summary)}")
             
             # Формируем caption с текстовой статистикой
             caption_text = f"🎮 **{riot_id}#{tagline}**\n\n"
             
             if summary:
+                print(f"📊 Обрабатываем summary...")
                 # Получаем данные из current_season
                 current_season = summary.get('current_season', {})
+                print(f"📊 Current season: {bool(current_season)}")
                 
                 # Ранг
                 rank = current_season.get('rank') or "Не определен"
@@ -98,8 +112,11 @@ async def profile_stat(message: Message):
                 caption_text += f"⚔️ **K/D:** {kd:.2f}\n"
                 
                 # Любимый агент из топ агентов
+                print(f"📊 Получаем топ агентов...")
                 top_agents = summary.get('top_agents', [])
-                if top_agents:
+                print(f"📊 Top agents: {type(top_agents)}, количество: {len(top_agents) if top_agents else 0}")
+                
+                if top_agents and len(top_agents) > 0:
                     main_agent = top_agents[0]
                     agent_name = main_agent.get('name', 'Неизвестен')
                     agent_matches = main_agent.get('matches_played', 0) or 0
