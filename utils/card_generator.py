@@ -62,14 +62,20 @@ def sanitize_filename(name: str) -> str:
 async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id: str, tagline: str, output_filename: str = None):
     """Генерация карточки через selenium (рекомендуемый метод)"""
     try:
+        print(f"🎯 Начинаем генерацию карточки для {riot_id}#{tagline}")
+        
         # Проверяем входные данные
         if not enhanced_stats or not isinstance(enhanced_stats, dict):
             print(f"❌ Неверные данные enhanced_stats: {enhanced_stats}")
             return None
             
+        print(f"✅ Enhanced stats валидны, ключей: {len(enhanced_stats.keys())}")
+        print(f"🔍 Ключи данных: {list(enhanced_stats.keys())[:10]}...")  # Показываем первые 10
+            
         from selenium import webdriver
         from selenium.webdriver.chrome.options import Options
         
+        print("🔧 Настройка selenium...")
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         template_path = os.path.join(project_root, 'templates', 'enhanced_profile_card.html')
         
@@ -77,6 +83,7 @@ async def generate_enhanced_profile_card_selenium(enhanced_stats: dict, riot_id:
             template_content = f.read()
 
         template = Template(template_content)
+        print("📄 HTML шаблон загружен")
 
         # Подготавливаем данные для шаблона с безопасным извлечением
         current_rank = enhanced_stats.get('current_rank') if enhanced_stats else None
@@ -240,6 +247,8 @@ async def generate_enhanced_profile_card(riot_id: str, tagline: str, output_file
             
         # Первый приоритет: selenium (более стабильный)
         print("🔄 Попытка генерации через selenium...")
+        print(f"📊 Данные enhanced_stats получены: {bool(enhanced_stats)}")
+        
         selenium_result = await generate_enhanced_profile_card_selenium(
             enhanced_stats, riot_id, tagline, output_filename
         )

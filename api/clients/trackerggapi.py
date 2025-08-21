@@ -129,12 +129,6 @@ class TrackerGGAPI:
                 metadata = rank_info.get('metadata', {})
                 tier_name = metadata.get('tierName')
                 
-                # Отладочная информация
-                print(f"🔍 Rank metadata: {metadata}")
-                print(f"🔍 Tier name: {tier_name}")
-                print(f"🔍 Display value: {rank_info.get('displayValue')}")
-                print(f"🔍 Value: {rank_info.get('value')}")
-                
                 if tier_name:
                     return tier_name
                 # Fallback на displayValue или value
@@ -201,15 +195,10 @@ class TrackerGGAPI:
             agent_attrs = favorite_agent.get('attributes', {})
             agent_id = agent_attrs.get('key')
             
-            print(f"🔍 Agent ID: {agent_id}")  # Отладка
-            print(f"🔍 Agent attributes: {agent_attrs}")  # Отладка
-            print(f"🔍 Agent stats: {agent_stats}")  # Отладка
-            
             try:
                 from ..models.agents import get_agent_name, get_agent_role
                 agent_name = get_agent_name(agent_id) if agent_id else "Unknown"
                 agent_role = get_agent_role(agent_id) if agent_id else "Unknown"
-                print(f"🔍 Resolved agent name: {agent_name}")  # Отладка
             except ImportError as e:
                 print(f"❌ Ошибка импорта: {e}")
                 agent_name = "Unknown"
