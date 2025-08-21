@@ -5,6 +5,7 @@ import json
 import cloudscraper
 import time
 import random
+import urllib.parse
 
 class TrackerGGAPI:
     """Интеграция с Tracker.gg API для получения расширенной статистики"""
@@ -238,7 +239,10 @@ class TrackerGGAPI:
     async def _try_httpx(self, riot_id: str, tagline: str) -> Optional[Dict]:
         """Попытка через обычный httpx"""
         try:
-            url = f"{self.BASE_URL}/profile/riot/{riot_id}%23{tagline}"
+            # URL-кодируем riot_id и tagline для поддержки кириллицы
+            encoded_riot_id = urllib.parse.quote(riot_id, safe='')
+            encoded_tagline = urllib.parse.quote(tagline, safe='')
+            url = f"{self.BASE_URL}/profile/riot/{encoded_riot_id}%23{encoded_tagline}"
             print(f"📡 httpx запрос: {url}")
             
             response = await self.client.get(url)
@@ -262,8 +266,12 @@ class TrackerGGAPI:
         def cloudscraper_sync(riot_id: str, tagline: str) -> Optional[Dict]:
             """Синхронная функция для CloudScraper"""
             try:
+                # URL-кодируем для поддержки кириллицы
+                encoded_riot_id = urllib.parse.quote(riot_id, safe='')
+                encoded_tagline = urllib.parse.quote(tagline, safe='')
+                
                 # Сначала посещаем главную страницу для получения cookies
-                main_url = f"https://tracker.gg/valorant/profile/riot/{riot_id}%23{tagline}/overview"
+                main_url = f"https://tracker.gg/valorant/profile/riot/{encoded_riot_id}%23{encoded_tagline}/overview"
                 print(f"🌐 CloudScraper: посещение главной страницы")
                 
                 main_response = self.cloud_scraper.get(main_url)
@@ -285,7 +293,7 @@ class TrackerGGAPI:
                 })
                 
                 # Теперь API запрос
-                api_url = f"{self.BASE_URL}/profile/riot/{riot_id}%23{tagline}"
+                api_url = f"{self.BASE_URL}/profile/riot/{encoded_riot_id}%23{encoded_tagline}"
                 print(f"🔗 CloudScraper API: {api_url}")
                 
                 api_response = self.cloud_scraper.get(api_url)

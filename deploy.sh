@@ -29,18 +29,28 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
+# Проверяем права доступа к Docker
+if ! docker ps &>/dev/null; then
+    echo "❗ Нужны права администратора для Docker..."
+    echo "🔧 Добавляем пользователя в группу docker..."
+    sudo usermod -aG docker $USER
+    echo "🔄 Перезагружаем группы..."
+    newgrp docker
+    echo "✅ Права настроены!"
+fi
+
 # Останавливаем старые контейнеры
 echo "🛑 Остановка старых контейнеров..."
-docker-compose down
+sudo docker-compose down 2>/dev/null || true
 
 # Пересобираем и запускаем
 echo "🔨 Сборка и запуск..."
-docker-compose up --build -d
+sudo docker-compose up --build -d
 
 # Показываем статус
 echo "📊 Статус контейнеров:"
-docker-compose ps
+sudo docker-compose ps
 
-echo "📝 Посмотреть логи: docker-compose logs -f"
-echo "🛑 Остановить: docker-compose down"
+echo "📝 Посмотреть логи: sudo docker-compose logs -f"
+echo "🛑 Остановить: sudo docker-compose down"
 echo "✅ Деплой завершен!"
